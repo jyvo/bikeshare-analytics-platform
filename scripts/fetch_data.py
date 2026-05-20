@@ -1,11 +1,7 @@
-from utils.path import get_git_root
-from utils.unzip import unzip
+from config import RAW_DATA_DIR
 import requests
 
 def main():
-    download_dir = get_git_root() / "data" / "raw"
-    download_dir.mkdir(parents=True, exist_ok=True)
-
     base_url = "https://ckan0.cf.opendata.inter.prod-toronto.ca/api/3/action"
 
     package_url = base_url + "/package_show"
@@ -17,27 +13,21 @@ def main():
 
     package = package_resp.json()
 
-    for _, resource in enumerate(package["result"]["resources"]):
+    for resource in package["result"]["resources"]:
         if not resource["datastore_active"]:
             url = base_url + "/resource_show?id=" + resource["id"]
             resource_metadata = requests.get(url).json()
-            # print(resource_metadata)
 
-            resource_dir = download_dir / resource_metadata["result"]["name"]
-            resource_dir.mkdir(parents=True, exist_ok=True)
+            file_name = resource_metadata["result"]["name"]
 
             try:
                 resp = requests.get(resource_metadata["result"]["url"], stream=True)
                 resp.raise_for_status()
-                
-                file_type = "." + resource_metadata["result"]["format"].lower()
-                file_name = resource_metadata["result"]["name"] + file_type
 
-                with open(resource_dir/file_name, "wb") as f:
+                with open(RAW_DATA_DIR / file_name, "wb") as f:
                     f.write(resp.content)
 
-                if file_type == ".zip":
-                    unzip(resource_dir / file_name, resource_dir)
+                print(f"Downloaded: {file_name}")
 
             except requests.exceptions.RequestException as e:
                 print(f"Error downloading file: {e}")
