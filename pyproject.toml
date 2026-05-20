@@ -5,12 +5,17 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.11.9"
 dependencies = [
+    "dash>=4.1.0",
+    "folium>=0.20.0",
     "gitpython>=3.1.45",
     "matplotlib>=3.10.5",
     "numpy>=2.3.2",
     "pandas>=2.3.1",
+    "plotly>=6.7.0",
+    "pyspark>=4.1.1",
     "requests>=2.32.4",
     "seaborn>=0.13.2",
+    "tqdm>=4.67.3",
 ]
 
 [dependency-groups]
