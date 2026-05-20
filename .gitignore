@@ -2,5 +2,5 @@
 **/.ipynb_checkpoints/
 **/__pycache__/
 *.egg-info/
-data/raw/
+data/
 anaconda_projects/
