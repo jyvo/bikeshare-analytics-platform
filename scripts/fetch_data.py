@@ -2,6 +2,8 @@ from config import RAW_DATA_DIR
 import requests
 
 def main():
+    RAW_DATA_DIR.mkdir(parents=True, exist_ok=True)
+
     base_url = "https://ckan0.cf.opendata.inter.prod-toronto.ca/api/3/action"
 
     package_url = base_url + "/package_show"
