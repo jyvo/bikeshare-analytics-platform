@@ -21,6 +21,11 @@ def main():
             resource_metadata = requests.get(url).json()
 
             file_name = resource_metadata["result"]["name"]
+            file_type = "." + resource_metadata["result"]["format"].lower()
+
+            # preserves file extension format (specifically for xlsx files)
+            if not file_name.lower().endswith(file_type):
+                file_name += file_type
 
             try:
                 resp = requests.get(resource_metadata["result"]["url"], stream=True)
