@@ -24,7 +24,7 @@ def main():
                 csv_path = destination / f"{sanitized_sheet_name}.csv"
                 df.to_csv(csv_path, index=False)
             
-            print(f"Converted {path.name} to CSV")
+            print(f"Extracted {path.name} worksheets as CSV")
         else:
             try:
                 with zipfile.ZipFile(path, "r") as zf:
