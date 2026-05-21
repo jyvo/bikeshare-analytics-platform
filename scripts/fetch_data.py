@@ -1,4 +1,5 @@
 from config import RAW_DATA_DIR
+from tqdm import tqdm
 import requests
 
 def main():
@@ -31,13 +32,25 @@ def main():
                 resp = requests.get(resource_metadata["result"]["url"], stream=True)
                 resp.raise_for_status()
 
-                with open(RAW_DATA_DIR / file_name, "wb") as f:
-                    f.write(resp.content)
+                bar = tqdm(
+                    desc=file_name.ljust(35),
+                    total=int(resp.headers.get("content-length", 0)),
+                    unit="B",
+                    unit_scale=True,
+                    unit_divisor=1024
+                )
 
-                print(f"Downloaded: {file_name}")
+                with open(RAW_DATA_DIR / file_name, "wb") as f:
+                    # could look to dynamically adjust chunk size based on file size
+                    for chunk in resp.iter_content(chunk_size=8192):
+                        if chunk:
+                            f.write(chunk)
+                            bar.update(len(chunk))
+                bar.close()
 
             except requests.exceptions.RequestException as e:
                 print(f"Error downloading file: {e}")
+
     print("Downloaded all raw data files")
 
 if __name__ == "__main__":
