@@ -20,6 +20,9 @@ class APIClient:
         response = self._session.get(url, params=params)
         response.raise_for_status()
         return response.json()
+    
+    def get_session(self) -> requests.Session:
+        return self._session
 
     def get_package(self) -> dict:
         if self._package_cache is None:
@@ -42,7 +45,7 @@ class APIClient:
             self._resource_cache = self._get("resource_show", params={"id": target["id"]})
         return self._resource_cache
 
-    def endpoints(self) -> Optional[list]:
+    def get_endpoints(self) -> Optional[list]:
         if self._endpoints_cache is None:
             resource_metadata = self.get_resource_metadata()
             if resource_metadata is None:
