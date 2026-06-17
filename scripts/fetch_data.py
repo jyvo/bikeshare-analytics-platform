@@ -1,25 +1,18 @@
-from config import RAW_DATA_DIR
+from config import RAW_DATA_DIR, API_PUB_BASE_URL, HIST_PACKAGE_PARAMS
+from utils.api_client import APIClient
 from tqdm import tqdm
 import requests
 
 def main():
     RAW_DATA_DIR.mkdir(parents=True, exist_ok=True)
-
-    base_url = "https://ckan0.cf.opendata.inter.prod-toronto.ca/api/3/action"
-
-    package_url = base_url + "/package_show"
-    params = {"id": "bike-share-toronto-ridership-data"}
-
-    package_resp = requests.get(package_url, params=params)
-
-    package_resp.raise_for_status()
-
-    package = package_resp.json()
+    
+    client = APIClient(base_url=API_PUB_BASE_URL, package_params=HIST_PACKAGE_PARAMS)
+    package = client.get_package()
 
     for resource in package["result"]["resources"]:
         if not resource["datastore_active"]:
-            url = base_url + "/resource_show?id=" + resource["id"]
-            resource_metadata = requests.get(url).json()
+            url = API_PUB_BASE_URL + "/resource_show?id=" + resource["id"]
+            resource_metadata = client.get_session().get(url).json()
 
             file_name = resource_metadata["result"]["name"]
             file_type = "." + resource_metadata["result"]["format"].lower()
@@ -29,7 +22,7 @@ def main():
                 file_name += file_type
 
             try:
-                resp = requests.get(resource_metadata["result"]["url"], stream=True)
+                resp = client.get_session().get(resource_metadata["result"]["url"], stream=True)
                 resp.raise_for_status()
 
                 bar = tqdm(
