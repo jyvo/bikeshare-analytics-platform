@@ -9,5 +9,5 @@ TMP_DATA_DIR = DATA_DIR / "temp"
 
 # config API parameters
 API_PUB_BASE_URL = "https://ckan0.cf.opendata.inter.prod-toronto.ca/api/3/action"
-RT_DATA_PARAMS = {"id": "bike-share-toronto"}
-HIST_DATA_PARAMS = {"id": "bike-share-toronto-ridership-data"}
+RT_PACKAGE_PARAMS = {"id": "bike-share-toronto"}
+HIST_PACKAGE_PARAMS = {"id": "bike-share-toronto-ridership-data"}
