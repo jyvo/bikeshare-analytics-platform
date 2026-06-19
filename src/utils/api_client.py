@@ -45,7 +45,7 @@ class APIClient:
             self._resource_cache = self._get("resource_show", params={"id": target["id"]})
         return self._resource_cache
 
-    def get_endpoints(self) -> Optional[list]:
+    def get_endpoints(self) -> Optional[dict]:
         if self._endpoints_cache is None:
             resource_metadata = self.get_resource_metadata()
             if resource_metadata is None:
@@ -59,9 +59,15 @@ class APIClient:
             response = self._session.get(endpoints_url)
             response.raise_for_status()
 
-            self._endpoints_cache = response.json()["data"]["en"]["feeds"]
+            self._endpoints_cache = {endpoint["name"]: endpoint["url"] for endpoint in response.json()["data"]["en"]["feeds"]}
         return self._endpoints_cache
     
+    def fetch_data(self, endpoint_name: str) -> Optional[dict]:
+        url = self.get_endpoints()[endpoint_name]
+        response = self._session.get(url)
+        response.raise_for_status()
+        return response.json()
+
     def clear_cache(self) -> None:
         self._package_cache = None
         self._resource_cache = None
