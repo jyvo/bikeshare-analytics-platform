@@ -28,9 +28,13 @@ class Client:
 
     def get_session(self) -> requests.Session:
         return self._session
+    
+    def get_data_feeds(self):
+        # implemented in subclass
+        return self._data_feeds
 
     def fetch_data(self, endpoint_name: str) -> Optional[dict]:
-        url = self.get_endpoints()[endpoint_name]
+        url = self.get_data_feeds()[endpoint_name]
         response = self._session.get(url)
         response.raise_for_status()
         return response.json()
@@ -80,10 +84,8 @@ class CKANClient(Client):
         return self._data_feeds
     
     def clear_cache(self) -> None:
-        self._package_cache = None
+        super().clear_cache()
         self._resource_cache = None
-        self._data_feeds = None
-
 
 class GBFSClient(Client):
     def __init__(self, base_url: str):
