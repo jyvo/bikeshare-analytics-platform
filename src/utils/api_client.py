@@ -4,31 +4,47 @@ from typing import Dict, Any, Optional
 
 logger = logging.getLogger(__name__)
 
-class APIClient:
-    def __init__(self, base_url: str, package_params: Dict[str, Any]) -> None:
+class Client:
+    def __init__(self, base_url: str, package_path: str, package_params: Dict[str, Any]=None) -> None:
         self._base_url = base_url.rstrip("/")
+        self._package_path = package_path
         self._package_params = package_params
 
         self._session = requests.Session()
-        
-        self._package_cache: Optional[dict] = None
-        self._resource_cache: Optional[dict] = None
-        self._endpoints_cache: Optional[list] = None
 
+        self._package_cache: Optional[dict] = None
+        self._data_feeds: Optional[list] = None
+    
     def _get(self, endpoint_path: str, params: dict = None) -> dict:
         url = f"{self._base_url}/{endpoint_path.lstrip('/')}"
         response = self._session.get(url, params=params)
         response.raise_for_status()
         return response.json()
     
+    def get_package(self) -> dict:
+        if self._package_cache is None:
+            self._package_cache = self._get(self._package_path, params=self._package_params)
+        return self._package_cache
+
     def get_session(self) -> requests.Session:
         return self._session
 
-    def get_package(self) -> dict:
-        if self._package_cache is None:
-            self._package_cache = self._get("package_show", params=self._package_params)
-        return self._package_cache
+    def fetch_data(self, endpoint_name: str) -> Optional[dict]:
+        url = self.get_endpoints()[endpoint_name]
+        response = self._session.get(url)
+        response.raise_for_status()
+        return response.json()
 
+    def clear_cache(self) -> None:
+        self._package_cache = None
+        self._data_feeds = None
+
+
+class CKANClient(Client):
+    def __init__(self, base_url: str, package_params: Dict[str, Any]) -> None:
+        super().__init__(base_url, "package_show", package_params)
+        self._resource_cache: Optional[dict] = None
+    
     def get_resource_metadata(self) -> Optional[dict]:
         if self._resource_cache is None:
             package = self.get_package()
@@ -45,30 +61,41 @@ class APIClient:
             self._resource_cache = self._get("resource_show", params={"id": target["id"]})
         return self._resource_cache
 
-    def get_endpoints(self) -> Optional[dict]:
-        if self._endpoints_cache is None:
+    def get_data_feeds(self) -> Optional[dict]:
+        if self._data_feeds is None:
             resource_metadata = self.get_resource_metadata()
             if resource_metadata is None:
                 return None
 
-            endpoints_url = resource_metadata["result"]["url"]
-            if not endpoints_url:
+            data_feed_url = resource_metadata["result"]["url"]
+            if not data_feed_url:
                 logger.error("Resource metadata does not contain a valid URL.")
                 return None
             
-            response = self._session.get(endpoints_url)
+            response = self._session.get(data_feed_url)
             response.raise_for_status()
+            data_feeds = response.json()["data"]["en"]["feeds"]
 
-            self._endpoints_cache = {endpoint["name"]: endpoint["url"] for endpoint in response.json()["data"]["en"]["feeds"]}
-        return self._endpoints_cache
+            self._data_feeds = {endpoint["name"]: endpoint["url"] for endpoint in data_feeds}
+        return self._data_feeds
     
-    def fetch_data(self, endpoint_name: str) -> Optional[dict]:
-        url = self.get_endpoints()[endpoint_name]
-        response = self._session.get(url)
-        response.raise_for_status()
-        return response.json()
-
     def clear_cache(self) -> None:
         self._package_cache = None
         self._resource_cache = None
-        self._endpoints_cache = None
+        self._data_feeds = None
+
+
+class GBFSClient(Client):
+    def __init__(self, base_url: str):
+        super().__init__(base_url, package_path="gbfs.json")
+        self._base_url = self._base_url.rstrip("/gbfs.json")
+
+    def get_data_feeds(self):
+        if self._data_feeds is None:
+            package = self.get_package()
+            if package is None:
+                return None
+            
+            data_feeds = package["data"]["feeds"]
+            self._data_feeds = {endpoint["name"]: endpoint["url"] for endpoint in data_feeds}
+        return self._data_feeds
