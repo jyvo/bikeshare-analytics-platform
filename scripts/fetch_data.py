@@ -1,17 +1,17 @@
-from config import RAW_DATA_DIR, API_PUB_BASE_URL, HIST_PACKAGE_PARAMS
-from utils.api_client import APIClient
+from config import RAW_DATA_DIR, CKAN_FEED, HIST_PACKAGE_PARAMS
+from utils.api_client import CKANClient
 from tqdm import tqdm
 import requests
 
 def main():
     RAW_DATA_DIR.mkdir(parents=True, exist_ok=True)
     
-    client = APIClient(base_url=API_PUB_BASE_URL, package_params=HIST_PACKAGE_PARAMS)
+    client = CKANClient(base_url=CKAN_FEED, package_params=HIST_PACKAGE_PARAMS)
     package = client.get_package()
 
     for resource in package["result"]["resources"]:
         if not resource["datastore_active"]:
-            url = API_PUB_BASE_URL + "/resource_show?id=" + resource["id"]
+            url = CKAN_FEED + "/resource_show?id=" + resource["id"]
             resource_metadata = client.get_session().get(url).json()
 
             file_name = resource_metadata["result"]["name"]
