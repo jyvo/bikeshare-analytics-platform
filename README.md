@@ -33,11 +33,11 @@ uv pip install -e .
 **Jupyter Notebook Kernel Setup**  
 With the virtual environment active, run the following to register the environment's kernel with Jupyter (name can be replaced)
 ```sh
-python -m ipykernel install --user --name=tbsa_venv
+uv run python -m ipykernel install --user --name=tba
 ```
 To open Jupyter Notebook, simply run:
 ```sh
-jupyter notebook
+uv run jupyter notebook
 ```
 Select the kernel from the dropdown menu if prompted or simply change the kernel by clicking on the button left of the hamburger dropdown menu at the top right of any notebook
 
