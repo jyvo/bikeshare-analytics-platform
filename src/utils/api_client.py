@@ -43,6 +43,10 @@ class Client:
         self._package_cache = None
         self._data_feeds = None
 
+    @classmethod
+    def map_data(cls, data: list, key: str, val: str) -> dict:
+        return {dat[key]: dat[val] for dat in data}
+
 
 class CKANClient(Client):
     def __init__(self, base_url: str, package_params: Dict[str, Any]) -> None:
@@ -80,7 +84,7 @@ class CKANClient(Client):
             response.raise_for_status()
             data_feeds = response.json()["data"]["en"]["feeds"]
 
-            self._data_feeds = {endpoint["name"]: endpoint["url"] for endpoint in data_feeds}
+            self._data_feeds = self.map_data(data_feeds, key="name", val="url")
         return self._data_feeds
     
     def clear_cache(self) -> None:
@@ -99,5 +103,5 @@ class GBFSClient(Client):
                 return None
             
             data_feeds = package["data"]["feeds"]
-            self._data_feeds = {endpoint["name"]: endpoint["url"] for endpoint in data_feeds}
+            self._data_feeds = self.map_data(data_feeds, key="name", val="url")
         return self._data_feeds
