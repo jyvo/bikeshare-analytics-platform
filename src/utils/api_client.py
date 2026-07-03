@@ -1,10 +1,11 @@
 import requests
 import logging
+from abc import ABC, abstractmethod
 from typing import Dict, Any, Optional
 
 logger = logging.getLogger(__name__)
 
-class Client:
+class Client(ABC):
     def __init__(self, base_url: str, package_path: str, package_params: Dict[str, Any]=None) -> None:
         self._base_url = base_url.rstrip("/")
         self._package_path = package_path
@@ -13,7 +14,7 @@ class Client:
         self._session = requests.Session()
 
         self._package_cache: Optional[dict] = None
-        self._data_feeds: Optional[list] = None
+        self._data_feeds: Optional[dict] = None
     
     def _get(self, endpoint_path: str, params: dict = None) -> dict:
         url = f"{self._base_url}/{endpoint_path.lstrip('/')}"
@@ -25,13 +26,10 @@ class Client:
         if self._package_cache is None:
             self._package_cache = self._get(self._package_path, params=self._package_params)
         return self._package_cache
-
-    def get_session(self) -> requests.Session:
-        return self._session
     
-    def get_data_feeds(self):
-        # implemented in subclass
-        return self._data_feeds
+    @abstractmethod
+    def get_data_feeds(self) -> Optional[dict]:
+        ...
 
     def fetch_data(self, endpoint_name: str) -> Optional[dict]:
         url = self.get_data_feeds()[endpoint_name]
@@ -94,7 +92,7 @@ class CKANClient(Client):
 class GBFSClient(Client):
     def __init__(self, base_url: str):
         super().__init__(base_url, package_path="gbfs.json")
-        self._base_url = self._base_url.rstrip("/gbfs.json")
+        self._base_url = self._base_url.removesuffix("/gbfs.json")
 
     def get_data_feeds(self):
         if self._data_feeds is None:
