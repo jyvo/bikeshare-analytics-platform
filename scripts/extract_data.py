@@ -1,5 +1,6 @@
 from config import RAW_DATA_DIR, TMP_DATA_DIR
 import zipfile
+import shutil
 import re
 import pandas as pd
 
@@ -34,6 +35,15 @@ def main():
                 with zipfile.ZipFile(path, "r") as zf:
                     zf.testzip()
                     zf.extractall(destination)
+                
+                # check for single nested dir
+                content = [f for f in destination.iterdir() if f.name != ".DS_Store"]
+
+                if len(content) == 1 and content[0].is_dir():
+                    nested = content[0]
+                    for f in nested.iterdir():
+                        shutil.move(str(f), str(destination))
+                    nested.rmdir()
                 print(f"Extracted {path.name}")
 
             except zipfile.BadZipFile:
