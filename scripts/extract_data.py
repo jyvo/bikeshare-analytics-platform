@@ -17,6 +17,10 @@ def main():
             file_df = pd.read_excel(path, sheet_name=None)
 
             for sheet_name, df in file_df.items():
+                if "Unnamed:" in " ".join(df.columns):
+                    df.columns = df.iloc[0]
+                    df = df.iloc[1:].reset_index(drop=True)
+                    
                 split_name = re.split(r"[ _-]+", sheet_name)
                 normalize = [w.capitalize() if re.fullmatch(r"[qQ]\d+", w) else w.lower() for w in split_name]
                 sanitized_sheet_name = "-".join(normalize)
