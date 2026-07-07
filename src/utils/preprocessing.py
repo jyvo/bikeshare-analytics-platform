@@ -34,3 +34,20 @@ def count_col_dtypes(df:pd.DataFrame, summarize_all:bool=False) -> None:
             print(val_counts)
             print()
     return
+
+def standardize_colnames(cols: tuple[str]) -> list[str]:
+    mapping = {"trip_start_time" : "start_time",
+                "trip_stop_time" : "end_time",
+                "trip_duration_seconds" : "trip_duration",
+                "to_station_id" : "start_station_id",
+                "to_station_name" : "start_station_name",
+                "from_station_id" : "end_station_id",
+                "from_station_name" : "end_station_name"}
+    
+    standardized = []
+    for col in cols:
+        cleaned = "_".join(col.lower().split())
+        if cleaned in mapping:
+            cleaned = mapping[cleaned]
+        standardized.append(cleaned)
+    return standardized
