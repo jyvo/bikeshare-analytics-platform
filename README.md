@@ -55,3 +55,4 @@ https://open.toronto.ca/dataset/bike-share-toronto/
 https://open.toronto.ca/dataset/bike-share-toronto-ridership-data/  
 https://open.toronto.ca/dataset/cycling-network/
 https://bikeshare-research.org/#bssid:toronto:data -> https://tor.publicbikesystem.net/ube/gbfs/v1/
+https://gbfs.org/documentation/reference/
