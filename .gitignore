@@ -1,4 +1,6 @@
 .venv/
+.DS_Store
+.ruff_cache/
 **/.ipynb_checkpoints/
 **/__pycache__/
 *.egg-info/
