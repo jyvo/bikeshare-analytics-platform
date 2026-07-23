@@ -18,3 +18,10 @@ CKAN_FEED = "https://ckan0.cf.opendata.inter.prod-toronto.ca/api/3/action"
 GBFS_FEED = "https://toronto.publicbikesystem.net/customer/gbfs/v3.0"
 CKAN_RT_PACKAGE_PARAMS = {"id": "bike-share-toronto"}
 HIST_PACKAGE_PARAMS = {"id": "bike-share-toronto-ridership-data"}
+
+# postgres params from .env
+POSTGRES_HOST = os.environ.get("POSTGRES_HOST", "localhost")
+POSTGRES_PORT = os.environ.get("POSTGRES_PORT", "5432")
+POSTGRES_DB = os.environ.get("POSTGRES_DB", "bikeshare")
+POSTGRES_USER = os.environ.get("POSTGRES_USER", "postgres")
+POSTGRES_PASSWORD = os.environ.get("POSTGRES_PASSWORD", "")
