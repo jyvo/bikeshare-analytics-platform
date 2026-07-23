@@ -23,16 +23,10 @@ jobs:
       - name: Lint src/ and scripts/
         run: uv run ruff check src scripts
 
-      # E402 is expected/unavoidable noise in notebooks (later cells import what they need
-      # mid-file) -- not a real issue, so it's excluded here rather than in a global config.
       - name: Lint notebooks
         run: uv run nbqa ruff notebooks --ignore E402
 
-      # Full notebook execution isn't run in CI: it needs the real historical corpus
-      # (data/, gitignored, not fetched here) and hits the live GBFS feed for the station
-      # crosswalk (PRD §1a: "no cached GBFS snapshot exists yet"). This is a structural
-      # smoke test only -- every notebook must at least be valid, parseable .ipynb JSON.
-      - name: Notebook structural smoke test
+      - name: Notebook structural test
         run: |
           uv run python -c "
           import sys

@@ -18,9 +18,6 @@ services:
       timeout: 5s
       retries: 10
 
-  # Self-hosted only (Docker), per PRD §6.4/§15 -- the n8n Cloud tier is never used, to
-  # keep net-zero cost intact. Not wired to anything yet: the hourly dispatch-alert
-  # trigger is Phase 4.5 work. Defined now so this file doesn't need a second pass later.
   n8n:
     image: n8nio/n8n:latest
     container_name: bikeshare-n8n
