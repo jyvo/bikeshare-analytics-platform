@@ -1,0 +1,52 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  lint-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+
+      - name: Set up Python
+        run: uv python install 3.11.9
+
+      - name: Sync dependencies (also builds/installs the src egg, per pyproject.toml)
+        run: uv sync
+
+      - name: Lint src/ and scripts/
+        run: uv run ruff check src scripts
+
+      # E402 is expected/unavoidable noise in notebooks (later cells import what they need
+      # mid-file) -- not a real issue, so it's excluded here rather than in a global config.
+      - name: Lint notebooks
+        run: uv run nbqa ruff notebooks --ignore E402
+
+      # Full notebook execution isn't run in CI: it needs the real historical corpus
+      # (data/, gitignored, not fetched here) and hits the live GBFS feed for the station
+      # crosswalk (PRD §1a: "no cached GBFS snapshot exists yet"). This is a structural
+      # smoke test only -- every notebook must at least be valid, parseable .ipynb JSON.
+      - name: Notebook structural smoke test
+        run: |
+          uv run python -c "
+          import sys
+          from pathlib import Path
+          import nbformat
+
+          failed = False
+          for nb_path in sorted(Path('notebooks').glob('*.ipynb')):
+              try:
+                  nb = nbformat.read(nb_path, as_version=4)
+                  nbformat.validate(nb)
+                  print(f'OK   {nb_path}')
+              except Exception as exc:
+                  print(f'FAIL {nb_path}: {exc}')
+                  failed = True
+          sys.exit(1 if failed else 0)
+          "
