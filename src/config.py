@@ -1,11 +1,17 @@
+import os
 from pathlib import Path
 
-BASE_DIR = Path(__file__).resolve().parent
+from dotenv import load_dotenv
+
+# packaged with the egg, proj root is one level up
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+load_dotenv(PROJECT_ROOT / ".env")
 
 # config data directories
-DATA_DIR = BASE_DIR / "data"
+DATA_DIR = PROJECT_ROOT / "data"
 RAW_DATA_DIR = DATA_DIR / "raw"
 TMP_DATA_DIR = DATA_DIR / "temp"
+RT_SNAPSHOT_DIR = DATA_DIR / "snapshot"
 
 # config API parameters
 CKAN_FEED = "https://ckan0.cf.opendata.inter.prod-toronto.ca/api/3/action"
