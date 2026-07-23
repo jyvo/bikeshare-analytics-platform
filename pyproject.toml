@@ -9,6 +9,7 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.11.9"
 dependencies = [
+    "dbt-duckdb>=1.10.1",
     "duckdb>=1.5.5",
     "folium>=0.20.0",
     "geopandas>=1.1.3",

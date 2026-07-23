@@ -128,5 +128,5 @@ def match_station_names(df: pl.DataFrame, rt_lookup: dict[str, str], fuzzy_thres
 
 
 def match_station_names_historical(df: pl.DataFrame, historical_lookup: dict[str, str], fuzzy_threshold: int = 90) -> pl.DataFrame:
-    # cross ref via loaders.pd_loader.build_historical_lookup) before the RT match runs
+    # cross ref via loaders.pl_loader.build_historical_lookup) before the RT match runs
     return _match_station_names_cascade(df, historical_lookup, fuzzy_threshold, matched_via_prefix="historical_")
